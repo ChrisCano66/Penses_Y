@@ -59,8 +59,20 @@ export default class TodoContextProvider extends Component {
     }
 
     // Method Delete
-    deleteTodo () {
-
+    deleteTodo (data) {
+        // on récupère les penses-bête déjà présents
+        let datas = [...this.state.todos];
+        // on recherche l'id du pense-bête que l'on veut éditer avec l'id dans données récupérées 
+        // et on passe cela à une variable "todo"
+        let todo = datas.find(todo => {
+            return todo.id === data.id
+        });
+        // on récupère alors l'ensemble des datas en enlevant le pense-bête que l'on veut supprimer (grâce au Splice)
+        datas.splice(datas.indexOf(todo),1)
+        // on change la constante d'état
+        this.setState( {
+            todos: datas,
+        })
     }
 
 
