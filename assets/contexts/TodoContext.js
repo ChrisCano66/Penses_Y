@@ -1,3 +1,6 @@
+// Creation d'un Context et de son provider afin de pouvoir "transférer" l'ensemble des valeurs des
+// différentes propriétés de la TodoList vers les différents composant de l'API
+
 import React, { Component, createContext } from 'react'
 
 export const TodoContext = createContext();
