@@ -13,9 +13,10 @@ export default class TodoContextProvider extends Component {
         // Etat reprenant l'ensemble des pense-bête
         this.state = {
             todos : [
-                {name: 'do somethink'},
-                {name: 'do somethink'},
-                {name: 'do somethink'},
+                {id: 1, text: 'do somethink'},
+                {id: 2, text: 'do somethink'},
+                {id: 3, text: 'do somethink'},
+                {id: 4, text: 'do somethink'},
             ],
         }
 
@@ -41,8 +42,20 @@ export default class TodoContextProvider extends Component {
     }
 
     // Method Update
-    updateTodo () {
-
+    updateTodo (data) {
+        // on récupère les penses-bête déjà présents
+        let datas = [...this.state.todos];
+        // on recherche l'id du pense-bête que l'on veut éditer avec l'id dans données récupérées 
+        // et on passe cela à une variable "todo"
+        let todo = datas.find(todo => {
+            return todo.id === data.id
+        }); 
+        // on assigne les nouvelles données de texte
+        todo.text = data.text
+        // on change la constante d'état
+        this.setState( {
+            todos: datas,
+        })
     }
 
     // Method Delete
