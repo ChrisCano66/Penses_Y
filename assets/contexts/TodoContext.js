@@ -1,7 +1,8 @@
 // Creation d'un Context et de son provider afin de pouvoir "transférer" l'ensemble des valeurs des
 // différentes propriétés de la TodoList vers les différents composant de l'API
 
-import React, { Component, createContext } from 'react'
+import React, { Component, createContext } from 'react';
+import axios from 'axios';
 
 export const TodoContext = createContext();
 
@@ -12,14 +13,9 @@ export default class TodoContextProvider extends Component {
 
         // Etat reprenant l'ensemble des pense-bête
         this.state = {
-            todos : [
-                {id: 1, text: 'do somethink'},
-                {id: 2, text: 'do somethink'},
-                {id: 3, text: 'do somethink'},
-                {id: 4, text: 'do somethink'},
-            ],
-        }
-
+            todos : [],
+        };
+        this.readTodo();
     }
 
     // Method Create
@@ -37,8 +33,17 @@ export default class TodoContextProvider extends Component {
     }
 
     // Method Read
+    // Utilisation de AXIOS pour la liaison entre le Back-end et le Front-end
     readTodo () {
-
+        // on lance axios avec l'url du TodoController (ensemble du routage)
+        axios.get('api/todo/read')
+            .then(response => {
+                this.setState({
+                    todos: response.data
+                });
+            }).catch(error => {
+                console.error(error);
+            })
     }
 
     // Method Update
