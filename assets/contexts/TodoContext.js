@@ -60,36 +60,52 @@ export default class TodoContextProvider extends Component {
 
     // Method Update
     updateTodo (data) {
-        // on récupère les penses-bête déjà présents
-        let datas = [...this.state.todos];
-        // on recherche l'id du pense-bête que l'on veut éditer avec l'id dans données récupérées 
-        // et on passe cela à une variable "todo"
-        let todo = datas.find(todo => {
-            return todo.id === data.id
-        }); 
-        // on assigne les nouvelles données de texte
-        todo.text = data.text
-        // on change la constante d'état
-        this.setState( {
-            todos: datas,
-        })
+        // on lance axios (methode put) avec l'url du TodoController (ensemble du routage) 
+        // pour la mise à jour des données de la bdd et qui sera gérer par le back-end
+        // enlui passant l'id du pênse-bête qui est mis à jour
+        axios.put('api/todo/update/' + data.id, data)
+            .then(response => {
+                // on récupère les penses-bête déjà présents
+                let datas = [...this.state.todos];
+                // on recherche l'id du pense-bête que l'on veut éditer avec l'id dans données récupérées 
+                // et on passe cela à une variable "todo"
+                let todo = datas.find(todo => {
+                    return todo.id === data.id
+                }); 
+                // on assigne les nouvelles données de texte
+                todo.text = data.text
+                // on change la constante d'état
+                this.setState( {
+                    todos: datas,
+                })
+            }).catch(error => {
+                console.error(error);
+            })
     }
 
     // Method Delete
     deleteTodo (data) {
-        // on récupère les penses-bête déjà présents
-        let datas = [...this.state.todos];
-        // on recherche l'id du pense-bête que l'on veut éditer avec l'id dans données récupérées 
-        // et on passe cela à une variable "todo"
-        let todo = datas.find(todo => {
-            return todo.id === data.id
-        });
-        // on récupère alors l'ensemble des datas en enlevant le pense-bête que l'on veut supprimer (grâce au Splice)
-        datas.splice(datas.indexOf(todo),1)
-        // on change la constante d'état
-        this.setState( {
-            todos: datas,
-        })
+        // on lance axios (methode put) avec l'url du TodoController (ensemble du routage) 
+        // pour la mise à jour des données de la bdd et qui sera gérer par le back-end
+        // enlui passant l'id du pênse-bête qui est mis à jour
+        axios.delete('api/todo/delete/' + data.id)
+            .then(response => {
+                // on récupère les penses-bête déjà présents
+                let datas = [...this.state.todos];
+                // on recherche l'id du pense-bête que l'on veut éditer avec l'id dans données récupérées 
+                // et on passe cela à une variable "todo"
+                let todo = datas.find(todo => {
+                    return todo.id === data.id
+                });
+                // on récupère alors l'ensemble des datas en enlevant le pense-bête que l'on veut supprimer (grâce au Splice)
+                datas.splice(datas.indexOf(todo),1)
+                // on change la constante d'état
+                this.setState( {
+                    todos: datas,
+                })
+            }).catch(error => {
+                console.error(error);
+            })
     }
 
 

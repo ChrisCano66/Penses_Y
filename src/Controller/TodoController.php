@@ -33,7 +33,7 @@ class TodoController extends AbstractController
         $this->todoRepository = $todoRepository;
     }
     
-    #[Route('/read', name: 'api_todo_read')]
+    #[Route("/read", name:"api_todo_read", methods:["GET"])]
     /** Fonction qui va nous permettre d'indexer l'ensembles des pense-bête présents dans la bdd et ainsi
      * les utiliser dans le front-end
      */
@@ -51,11 +51,11 @@ class TodoController extends AbstractController
         return $this->json($arrayOfTodos);
     }
 
-    #[Route('/create', name: 'api_todo_create')]
+    #[Route("/create", name:"api_todo_create", methods:["POST"])]
     /**
      * Fonction qui va nous permettre de créer l'ensembles des pense-bête dans la bdd et ainsi les stocker
      * @param Request $request
-     * @return void
+     * @return JsonResponse
      */
     public function create(Request $request)
     {
@@ -75,6 +75,7 @@ class TodoController extends AbstractController
             $this->entityManager->persist($todo);
             /** update de la bdd avec les nouvelles données */
             $this->entityManager->flush();
+            /** on retourne un message de confirmation */
             return $this->json([
                 'todo' => $todo->toArray(),
             ]);
@@ -82,4 +83,59 @@ class TodoController extends AbstractController
             //error message
         }
     }
+
+    #[Route("/update/{id}", name:"api_todo_update", methods:["PUT"])]
+    /**
+     * Fonction qui va nous permettre de créer l'ensembles des pense-bête dans la bdd et ainsi les stocker
+     * @param Request $request
+     * @param Todo $todo
+     * @return JsonResponse
+     */
+    public function update(Request $request, Todo $todo)
+    {
+        /** création d'une variable qui va permettre de décoder les données envoyé par axios post côté front-end ($request) 
+         * et de les stocker dans la varible */
+        $content = json_decode($request->getContent());
+
+        /** on set le nouveau text mis à jour avec le setter de Todo.php */
+        $todo->setText($content->text);
+
+        /** update de la bdd avec les nouvelles données On push ces nouvelles données dans la bdd */
+        try {
+            /** On push ces nouvelles données dans la bdd */
+            $this->entityManager->flush();
+        } catch (\Exception $exception) {
+            //error message
+        }
+
+        /** on retourne un message de confirmation dela mise à jour */
+        return $this->json([
+            'message' => 'Le pense-bête a été mis à jour.',
+        ]);
+    }
+
+    #[Route("/delete/{id}", name:"api_todo_delete", methods:["DELETE"])]
+    /**
+     * Fonction qui va nous permettre la suppression d'un pense-bête de la bdd
+     * @param Todo $todo
+     * @return JsonResponse
+     */
+    public function delete(Todo $todo)
+    {
+        /** suppresion du pense-bête donc l'id correspond  */
+        try {
+            /** Opération de suppression du pense-bête */
+            $this->entityManager->remove($todo);
+            /** On push ces nouvelles données dans la bdd */
+            $this->entityManager->flush();
+        } catch (\Exception $exception) {
+            //error message
+        }
+
+        /** on retourne un message de confirmation de la suppression */
+        return $this->json([
+            'message' => 'Le pense-bête a bien été supprimé.',
+        ]);
+    }
+
 }
