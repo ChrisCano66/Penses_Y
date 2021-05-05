@@ -3,12 +3,13 @@
 namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\TodoRepository;
+use Symfony\Component\HttpFoundation\Request;
+use App\Entity\Todo;
 
-#[Route('/api/todo', name: 'todo')]
+#[Route('/api/todo', name: 'api_todo')]
 class TodoController extends AbstractController
 {
     /** 
@@ -32,7 +33,7 @@ class TodoController extends AbstractController
         $this->todoRepository = $todoRepository;
     }
     
-    #[Route('/read', name: 'todo')]
+    #[Route('/read', name: 'api_todo_read')]
     /** Fonction qui va nous permettre d'indexer l'ensembles des pense-bête présents dans la bdd et ainsi
      * les utiliser dans le front-end
      */
@@ -48,5 +49,37 @@ class TodoController extends AbstractController
         }
         /** transformation de l'array en json pour le front-end */
         return $this->json($arrayOfTodos);
+    }
+
+    #[Route('/create', name: 'api_todo_create')]
+    /**
+     * Fonction qui va nous permettre de créer l'ensembles des pense-bête dans la bdd et ainsi les stocker
+     * @param Request $request
+     * @return void
+     */
+    public function create(Request $request)
+    {
+        /** création d'une variable qui va permettre de décoder les données envoyé par axios post côté front-end ($request) 
+         * et de les stocker dans la varible */
+        $content = json_decode($request->getContent());
+
+        /** on crée un nouveau pense-bête */
+        $todo = new Todo();
+
+        /** on set le text avec le setter de Todo.php */
+        $todo->setText($content->text);
+
+        /** On va faire persister ces doinnées dans la bdd */
+        try {
+            /** persistance des données */
+            $this->entityManager->persist($todo);
+            /** update de la bdd avec les nouvelles données */
+            $this->entityManager->flush();
+            return $this->json([
+                'todo' => $todo->toArray(),
+            ]);
+        } catch (\Exception $exception) {
+            //error message
+        }
     }
 }
