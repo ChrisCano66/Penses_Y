@@ -23,6 +23,8 @@ class TodoController extends AbstractController
     private $todoRepository;
     
     
+
+
     /** constructeur de la class/controller qui aura besoin du manager d'entity pour récupérer les données de la base de données 
      * ainsi que le TodoRepository qui permet de faire les requêtes sql vers la base de données 
      */
@@ -33,6 +35,8 @@ class TodoController extends AbstractController
         $this->todoRepository = $todoRepository;
     }
     
+
+
     #[Route("/read", name:"api_todo_read", methods:["GET"])]
     /** Fonction qui va nous permettre d'indexer l'ensembles des pense-bête présents dans la bdd et ainsi
      * les utiliser dans le front-end
@@ -50,6 +54,8 @@ class TodoController extends AbstractController
         /** transformation de l'array en json pour le front-end */
         return $this->json($arrayOfTodos);
     }
+
+
 
     #[Route("/create", name:"api_todo_create", methods:["POST"])]
     /**
@@ -75,14 +81,20 @@ class TodoController extends AbstractController
             $this->entityManager->persist($todo);
             /** update de la bdd avec les nouvelles données */
             $this->entityManager->flush();
-            /** on retourne un message de confirmation */
-            return $this->json([
-                'todo' => $todo->toArray(),
-            ]);
         } catch (\Exception $exception) {
-            //error message
+            return $this->json([
+                'message' => ['text' => ['Votre pense-bête n\'a pas pu être envoyé à la base de données ! '], 'level' => 'error']
+            ]);
         }
+
+        /** on retourne un message de confirmation */
+        return $this->json([
+            'todo' => $todo->toArray(),
+            'message' => ['text' => ['Le Pense-bête a bien été créé ! ', 'Pense-bête : '.$content->text], 'level' => 'success']
+        ]);
     }
+
+
 
     #[Route("/update/{id}", name:"api_todo_update", methods:["PUT"])]
     /**
@@ -113,6 +125,8 @@ class TodoController extends AbstractController
             'message' => 'Le pense-bête a été mis à jour.',
         ]);
     }
+
+
 
     #[Route("/delete/{id}", name:"api_todo_delete", methods:["DELETE"])]
     /**
