@@ -24,13 +24,27 @@ function TodoTable () {
     // constante d'état permettant de savoir quel pense-bête va être supprimer (contient l'id et le texte)
     const [todoToDelete, setTodoToDelete] = useState(null);
 
+    // const 
+    const onCreateSubmit = (event) => {
+        event.preventDefault();
+        context.createTodo(event, {text: addTodo});
+        setAddTodo('');
+    }
+
+    // const 
+    const onEditSubmit = (todoId, event) => {
+        event.preventDefault();
+        context.updateTodo({id: todoId, text: editTodo});
+        setAddTodo('');
+    }
+
+    // HTML Retourné
     return (
 
         // Formulaire qui reprend les différents pense-bête et qui peut "submit" pour l'ajout, l'édition et la suppression d'un pense-bête =>
         // onSubmit -> method createTodo de la class TodoContextProvider qui va récupérer la valeur rajouter pour un nouveau pense-bête
 
         <Fragment>
-            <form onSubmit={(event) => {context.createTodo(event, {text: addTodo})}}>
                 <Table>
                     {/* En-tête de la table */}
                     <TableHead>
@@ -44,20 +58,22 @@ function TodoTable () {
                         {/* Champ text pour l'ajout d'un nouveau pense-bête */}
                         <TableRow>
                             <TableCell>
-                                {/* Le Field permettra de rajouter du contenu pour un pense-bête, la valeur sera rajouter
-                                    à la constante d'état (hook) "addTodo", la méthode "onChange" va contrôler le changement
-                                    d'état de la constante -> sur un event il va donc rajouter la valeur du TextField à la
-                                    constante d'état La validation du champ avec la touche entrée permet le submit !
-                                    Rajout du "type='submit'" pour l'icône d'ajout */}
-                                <TextField
-                                    value={addTodo}
-                                    onChange={(event) => {setAddTodo(event.target.value)}}
-                                    label="Ajouter un nouveau Pense-Bête"
-                                    fullWidth={true}
-                                />
+                                <form onSubmit={onCreateSubmit}>
+                                    {/* Le Field permettra de rajouter du contenu pour un pense-bête, 
+                                        la valeur sera rajouter à la constante d'état (hook) "addTodo", 
+                                        la méthode "onChange" va contrôler le changement d'état de la constante -> sur un event il va 
+                                        donc rajouter la valeur du TextField à la constante d'état La validation du champ avec 
+                                        la touche entrée permet le submit ! */}
+                                    <TextField
+                                        type="text"
+                                        value={addTodo}
+                                        onChange={(event) => {setAddTodo(event.target.value)}}
+                                        label="Ajouter un nouveau Pense-Bête"
+                                        fullWidth={true}/>
+                                </form>
                             </TableCell>
                             <TableCell align="right">
-                                <IconButton type="submit">
+                                <IconButton onClick={onCreateSubmit}>
                                     <AddIcon/>
                                 </IconButton>
                             </TableCell>
@@ -74,29 +90,32 @@ function TodoTable () {
                                     {/* Expression regulière permettant de vérifier l'état de l'éditiion d'un pense-bête :
                                     si oui, on permet l'édition / si non, on affiche le text */}
                                     {editIsShown === todo.id ?
-                                        <TextField
-                                            fullWidth={true}
-                                            value={editTodo}
-                                            // on récupère la nouvelle valeur du texte et on l'assigne à la varaible d'état
-                                            onChange={(event) => {
-                                                setEditTodo(event.target.value);
-                                            }}
-                                            InputProps={{
-                                                // Permet de rajouter des actions/éléments au TextFeild : ici une "div" avec des boutons
-                                                endAdornment: <Fragment>
-                                                    {/* Bouton permettant d'annuler l'edition */}
-                                                    <IconButton onClick={() => {
-                                                        setEditIsShown(false);
-                                                    }}><CloseIcon/></IconButton>
-                                                    {/* Bouton permettant de valider l'edition et de lancer la méthode d'Update du Context et en lui
-                                                    passant un objet contenant l'id et le nouveau texte du pense-bête sélectionnée */}
-                                                    <IconButton onClick={() => {
-                                                        context.updateTodo({id: todo.id, text: editTodo});
-                                                        setEditIsShown(false);
-                                                    }}><DoneIcon/></IconButton>
-                                                </Fragment>
-                                            }}
-                                        />
+                                        <form onSubmit={onEditSubmit.bind(this, todo.id)}>
+                                            <TextField
+                                                type="text"
+                                                fullWidth={true}
+                                                autoFocus={true}
+                                                value={editTodo}
+                                                // on récupère la nouvelle valeur du texte et on l'assigne à la varaible d'état
+                                                onChange={(event) => {
+                                                    setEditTodo(event.target.value);
+                                                }}
+                                                InputProps={{
+                                                    // Permet de rajouter des actions/éléments au TextFeild : ici une "div" avec des boutons
+                                                    endAdornment: <Fragment>
+                                                        {/* Bouton permettant d'annuler l'edition */}
+                                                        <IconButton onClick={() => {
+                                                            setEditIsShown(false);
+                                                        }}><CloseIcon/></IconButton>
+                                                        {/* Bouton permettant de valider l'edition et de lancer la méthode d'Update du Context et en lui
+                                                        passant un objet contenant l'id et le nouveau texte du pense-bête sélectionnée */}
+                                                        <IconButton type="submit">
+                                                            <DoneIcon/>
+                                                        </IconButton>
+                                                    </Fragment>
+                                                }}
+                                            />
+                                        </form>
                                         :
                                         todo.text
                                     }
@@ -121,7 +140,6 @@ function TodoTable () {
                         ))}
                     </TableBody>
                 </Table>
-            </form>
             
             {/* Informations à passer à la fonction DeleteDialog lorsque l'on clique sur le bouton desuppression d'un pense-bête */}
             {deleteConfirmationIsShown && (

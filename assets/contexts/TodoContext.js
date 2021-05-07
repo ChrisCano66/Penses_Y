@@ -11,9 +11,10 @@ export default class TodoContextProvider extends Component {
     constructor(props) {
         super(props);
 
-        // Etat reprenant l'ensemble des pense-bête
+        // Etat reprenant l'ensemble des pense-bête (todos) et des messages associés 
         this.state = {
             todos : [],
+            message: {},
         };
         this.readTodo();
     }
@@ -28,15 +29,22 @@ export default class TodoContextProvider extends Component {
         axios.post('api/todo/create', todo)
             // on obtient une réponse que l'on passe directement aux todos de la variable d'état du constructeur
             .then(response => {
-                console.log(response.data);
-                // on récupère les penses-bête déjà présents
-                let data = [...this.state.todos];
-                // on rajoute le nouveau pense-bête que l'on veut rajouter
-                data.push(response.data.todo);
-                // on change la constante d'état
-                this.setState( {
-                    todos: data,
-                })
+                // si message de succes au niveaude axios =>
+                if (response.data.message.level === 'success') {
+                    // on récupère les penses-bête déjà présents
+                    let data = [...this.state.todos];
+                    // on rajoute le nouveau pense-bête que l'on veut rajouter
+                    data.push(response.data.todo);
+                    // on change la constante d'état
+                    this.setState( {
+                        todos: data,
+                        message: response.data.message,
+                    })
+                } else {
+                    this.setState({
+                        message: response.data.message,
+                    })
+                }      
             }).catch(error => {
                 console.error(error);
             })
@@ -65,19 +73,27 @@ export default class TodoContextProvider extends Component {
         // enlui passant l'id du pênse-bête qui est mis à jour
         axios.put('api/todo/update/' + data.id, data)
             .then(response => {
-                // on récupère les penses-bête déjà présents
-                let datas = [...this.state.todos];
-                // on recherche l'id du pense-bête que l'on veut éditer avec l'id dans données récupérées 
-                // et on passe cela à une variable "todo"
-                let todo = datas.find(todo => {
-                    return todo.id === data.id
-                }); 
-                // on assigne les nouvelles données de texte
-                todo.text = data.text
-                // on change la constante d'état
-                this.setState( {
-                    todos: datas,
-                })
+                // si message de succes au niveaude axios =>
+                if (response.data.message.level === 'error') {
+                    this.setState({
+                        message: response.data.message,
+                    });
+                } else {
+                    // on récupère les penses-bête déjà présents
+                    let datas = [...this.state.todos];
+                    // on recherche l'id du pense-bête que l'on veut éditer avec l'id dans données récupérées 
+                    // et on passe cela à une variable "todo"
+                    let todo = datas.find(todo => {
+                        return todo.id === data.id
+                    }); 
+                    // on assigne les nouvelles données de texte
+                    todo.text = data.text
+                    // on change la constante d'état
+                    this.setState( {
+                        todos: datas,
+                        message: response.data.message,
+                    });
+                } 
             }).catch(error => {
                 console.error(error);
             })
@@ -90,19 +106,27 @@ export default class TodoContextProvider extends Component {
         // enlui passant l'id du pênse-bête qui est mis à jour
         axios.delete('api/todo/delete/' + data.id)
             .then(response => {
-                // on récupère les penses-bête déjà présents
-                let datas = [...this.state.todos];
-                // on recherche l'id du pense-bête que l'on veut éditer avec l'id dans données récupérées 
-                // et on passe cela à une variable "todo"
-                let todo = datas.find(todo => {
-                    return todo.id === data.id
-                });
-                // on récupère alors l'ensemble des datas en enlevant le pense-bête que l'on veut supprimer (grâce au Splice)
-                datas.splice(datas.indexOf(todo),1)
-                // on change la constante d'état
-                this.setState( {
-                    todos: datas,
-                })
+                // si message de succes au niveaude axios =>
+                if (response.data.message.level === 'error') {
+                    this.setState({
+                        message: response.data.message,
+                    });
+                } else {
+                    // on récupère les penses-bête déjà présents
+                    let datas = [...this.state.todos];
+                    // on recherche l'id du pense-bête que l'on veut éditer avec l'id dans données récupérées 
+                    // et on passe cela à une variable "todo"
+                    let todo = datas.find(todo => {
+                        return todo.id === data.id
+                    });
+                    // on récupère alors l'ensemble des datas en enlevant le pense-bête que l'on veut supprimer (grâce au Splice)
+                    datas.splice(datas.indexOf(todo),1)
+                    // on change la constante d'état
+                    this.setState( {
+                        todos: datas,
+                        message: response.data.message,
+                    });
+                }
             }).catch(error => {
                 console.error(error);
             })
@@ -116,6 +140,7 @@ export default class TodoContextProvider extends Component {
                 createTodo: this.createTodo.bind(this),
                 updateTodo: this.updateTodo.bind(this),
                 deleteTodo: this.deleteTodo.bind(this),
+                setMessage: (message) => this.setState({message: message}),
             }}>
                 {this.props.children}
             </TodoContext.Provider>

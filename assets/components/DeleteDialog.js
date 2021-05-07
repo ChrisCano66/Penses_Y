@@ -37,11 +37,10 @@ function DeleteDialog (props) {
 // à la fonction via le TodoTable
 DeleteDialog.propTypes ={
     // On force la paramètre "todo" à renvoyer un objet qui récupère une id et un textdu pense-bête sélectionné ({id: PropTypes.number, text:propTypes.string})
-    //todo: PropTypes.shape = ({
-    //    id: PropTypes.number, 
-    //    text: PropTypes.string,
-    //}),
-    todo: PropTypes.object.isRequired,
+    todo: PropTypes.shape({
+        id: PropTypes.number.isRequired, 
+        text: PropTypes.string.isRequired,
+    }),
     // On force la paramètre "Open" à être un booleen
     open: PropTypes.bool.isRequired,
     // On demande au DeleteDialog de paser une fonction (qui est la fonction du même nom "setDeleteConfirmationIsShown")
