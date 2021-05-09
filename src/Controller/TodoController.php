@@ -74,6 +74,7 @@ class TodoController extends AbstractController
 
         /** on set le text avec le setter de Todo.php */
         $todo->setText($content->text);
+        $todo->setDescription($content->description);
 
         /** On va faire persister ces doinnées dans la bdd */
         try {
@@ -83,7 +84,7 @@ class TodoController extends AbstractController
             $this->entityManager->flush();
         } catch (\Exception $exception) {
             return $this->json([
-                'message' => ['text' => 'Impossible de joindre la Base de données afin d\'envoyé le Pense-bête !', 'level' => 'error']
+                'message' => ['text' => 'Impossible de joindre la Base de données afin de rajouter le Pense-bête !', 'level' => 'error']
             ]);
         }
 
@@ -109,8 +110,18 @@ class TodoController extends AbstractController
          * et de les stocker dans la varible */
         $content = json_decode($request->getContent());
 
+        // On compare les données de la BDD avec les nouvelles donées que l'on veut mettre a jour pour le pense-bête sélectionné
+        // s'il n'y apas de changement (aussi bien pour le nom du pense-bête que pour la description) on renvoit un message 
+        // indiquant qu'il n'y apas eu de changement et donc qu'il n'est pas nécessaire de faire la mise à jour du pense-bête
+        if ($todo->getText() === $content->text && $todo->getDescription() === $content->description) {
+            return $this->json([
+                'message' => ['text' => 'Il n\'y a pas eu de changement (nom ou description) dans le Pense-bête !', 'level' => 'error'],
+            ]);
+        }
+
         /** on set le nouveau text mis à jour avec le setter de Todo.php */
         $todo->setText($content->text);
+        $todo->setDescription($content->description);
 
         /** update de la bdd avec les nouvelles données On push ces nouvelles données dans la bdd */
         try {
@@ -124,6 +135,7 @@ class TodoController extends AbstractController
 
         /** on retourne un message de confirmation dela mise à jour */
         return $this->json([
+            'todo' => $todo->toArray(),
             'message' => ['text' => 'Le pense-bête a été mis à jour.', 'level' => 'success']
         ]);
     }

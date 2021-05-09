@@ -1,7 +1,7 @@
 import React, {Fragment, useContext, useState} from 'react';
 import {TodoContext} from "../contexts/TodoContext.js";
 import DeleteDialog from './DeleteDialog.js';
-import {IconButton, Table, TableBody, TableCell, TableHead, TableRow, TextField} from "@material-ui/core";
+import {IconButton, Table, TableBody, TableCell, TableHead, TableRow, TextField, Typography} from "@material-ui/core";
 import AddIcon from '@material-ui/icons/Add';
 import EditIcon from '@material-ui/icons/Edit';
 import Delete from '@material-ui/icons/Delete';
@@ -13,29 +13,34 @@ function TodoTable () {
 
     // constante de context sous forme de Hooks utilisant le "useContext" afin de pouvoir utiliser le contextProvider
     const context = useContext(TodoContext);
-    // constante d'état permettant l'ajout d'un pense-bête sous forme de Hooks utilisant le "state" et qui est initialiser par une String vide
-    const [addTodo, setAddTodo] = useState('');
+    // constante d'état permettant l'ajout d'un pense-bête ("le nom") sous forme de Hooks utilisant le "state" et qui est initialiser par une String vide
+    const [addTodoText, setAddTodoText] = useState('');
+    // constante d'état permettant l'ajout d'un pense-bête ("description") sous forme de Hooks utilisant le "state" et qui est initialiser par une String vide
+    const [addTodoDescription, setAddTodoDescription] = useState('');
     // constante d'état permettant de savoir l'état de l'action d'édition d'un pense-bête sous forme de Hooks utilisant le "state"
     const [editIsShown, setEditIsShown] = useState(false);
-    // constante d'état permettant d'édition d'un pense-bête sous forme de Hooks utilisant le "state" et qui est initialiser par une String vide
-    const [editTodo, setEditTodo] = useState('');
+    // constante d'état permettant d'édition du nom d'un pense-bête sous forme de Hooks utilisant le "state" et qui est initialiser par une String vide
+    const [editTodoText, setEditTodoText] = useState('');
+    // constante d'état permettant d'édition de la description d'un pense-bête sous forme de Hooks utilisant le "state" et qui est initialiser par une String vide
+    const [editTodoDescription, setEditTodoDescription] = useState('');
     // constante d'état permettant de savoir l'état de l'action de suppression d'un pense-bête sous forme de Hooks utilisant le "state"
     const [deleteConfirmationIsShown, setDeleteConfirmationIsShown] = useState(false);
     // constante d'état permettant de savoir quel pense-bête va être supprimer (contient l'id et le texte)
     const [todoToDelete, setTodoToDelete] = useState(null);
 
-    // const 
+    // const qui permet de créer un Pense-bête en reliant l'information Front-end (TodoTable) au transfert de l'info back-end (TodoContext + axios)
     const onCreateSubmit = (event) => {
         event.preventDefault();
-        context.createTodo(event, {text: addTodo});
-        setAddTodo('');
+        context.createTodo(event, {text: addTodoText, description: addTodoDescription});
+        setAddTodoText('');
+        setAddTodoDescription('');
     }
 
-    // const 
+    // const qui permet de mettre à jour un Pense-bête en reliant l'information Front-end (TodoTable) au transfert de l'info back-end (TodoContext + axios)
     const onEditSubmit = (todoId, event) => {
         event.preventDefault();
-        context.updateTodo({id: todoId, text: editTodo});
-        setAddTodo('');
+        context.updateTodo({id: todoId, text: editTodoText, description: editTodoDescription});
+        setEditIsShown(false);
     }
 
     // HTML Retourné
@@ -49,27 +54,38 @@ function TodoTable () {
                     {/* En-tête de la table */}
                     <TableHead>
                         <TableRow>
-                            <TableCell align="left">Pense-Bête</TableCell>
+                            <TableCell>Pense-Bête</TableCell>
+                            <TableCell>Description</TableCell>
                             <TableCell align="left">Actions</TableCell>
                         </TableRow>
                     </TableHead>
                     {/* Corps de la table */}
                     <TableBody>
-                        {/* Champ text pour l'ajout d'un nouveau pense-bête */}
+                        {/* Champ text pour l'ajout d'un nouveau pense-bête (nom + description) */}
                         <TableRow>
                             <TableCell>
                                 <form onSubmit={onCreateSubmit}>
                                     {/* Le Field permettra de rajouter du contenu pour un pense-bête, 
-                                        la valeur sera rajouter à la constante d'état (hook) "addTodo", 
+                                        la valeur sera rajouter à la constante d'état (hook) "addTodoText", 
                                         la méthode "onChange" va contrôler le changement d'état de la constante -> sur un event il va 
                                         donc rajouter la valeur du TextField à la constante d'état La validation du champ avec 
                                         la touche entrée permet le submit ! */}
                                     <TextField
                                         type="text"
-                                        value={addTodo}
-                                        onChange={(event) => {setAddTodo(event.target.value)}}
-                                        label="Ajouter un nouveau Pense-Bête"
+                                        value={addTodoText}
+                                        onChange={(event) => {setAddTodoText(event.target.value)}}
+                                        label="Nom du Pense-Bête"
                                         fullWidth={true}/>
+                                </form>
+                            </TableCell>
+                            <TableCell>
+                                <form>
+                                    <TextField
+                                        type="text"
+                                        value={addTodoDescription}
+                                        onChange={(event) => {setAddTodoDescription(event.target.value)}}
+                                        label="Description du Pense-Bête"
+                                        fullWidth={true} multiline={true}/>
                                 </form>
                             </TableCell>
                             <TableCell align="right">
@@ -78,8 +94,8 @@ function TodoTable () {
                                 </IconButton>
                             </TableCell>
                         </TableRow>
-                        {/* Zone d'icônes pour l'édition et la suppression d'un pense-bête
-                            Récupération des pense-bête dans le context (TodoContextProvider)
+                        {/* Zone d'icônes pour l'édition d'un pense-bête (nom + description) */}
+                        {/* Récupération des pense-bête dans le context (TodoContextProvider)
                             slice() => permet de copier une partie d'un tableau et de le renvoyer
                             Reverse() => permet de mettre "à l'envers" un tableau => permet d'avoir les nouveaux ajouts directement en début de liste
                             map() => permet de créer un nouveu tableau à partir de toutes les donées de tableau avec une clef */}
@@ -95,53 +111,71 @@ function TodoTable () {
                                                 type="text"
                                                 fullWidth={true}
                                                 autoFocus={true}
-                                                value={editTodo}
-                                                // on récupère la nouvelle valeur du texte et on l'assigne à la varaible d'état
-                                                onChange={(event) => {
-                                                    setEditTodo(event.target.value);
-                                                }}
-                                                InputProps={{
-                                                    // Permet de rajouter des actions/éléments au TextFeild : ici une "div" avec des boutons
-                                                    endAdornment: <Fragment>
-                                                        {/* Bouton permettant d'annuler l'edition */}
-                                                        <IconButton onClick={() => {
-                                                            setEditIsShown(false);
-                                                        }}><CloseIcon/></IconButton>
-                                                        {/* Bouton permettant de valider l'edition et de lancer la méthode d'Update du Context et en lui
-                                                        passant un objet contenant l'id et le nouveau texte du pense-bête sélectionnée */}
-                                                        <IconButton type="submit">
-                                                            <DoneIcon/>
-                                                        </IconButton>
-                                                    </Fragment>
-                                                }}
+                                                value={editTodoText}
+                                                onChange={(event) => {setEditTodoText(event.target.value);}}
                                             />
                                         </form>
                                         :
-                                        todo.text
+                                        // typography => juste donné plus de style à l'écriture
+                                        <Typography>{todo.text}</Typography>
                                     }
                                 </TableCell>
+                                <TableCell>
+                                    {editIsShown === todo.id ?
+                                        <TextField
+                                            type="text"
+                                            fullWidth={true}
+                                            value={editTodoDescription}
+                                            // on récupère la nouvelle valeur du texte et on l'assigne à la varaible d'état
+                                            onChange={(event) => {setEditTodoDescription(event.target.value);}}
+                                            multiline={true}
+                                        />
+                                        :
+                                        // typography => 'pre-wrap' permet d'aller à la ligne quand on fait "entrée"
+                                        <Typography style={{whiteSpace: 'pre-wrap'}}>{todo.description}</Typography>
+                                    }
+                                </TableCell>
+
                                 <TableCell align="right">
-                                    {/* Bouton permettant l'édition d'un pense-bête et ses actions liées */}
-                                    <IconButton onClick={() => {
-                                        setEditIsShown(todo.id);
-                                        setEditTodo(todo.text);
-                                    }}>
-                                        <EditIcon/>
-                                    </IconButton>
-                                    {/* Bouton permettant la suppression d'un pense-bête et ses actions liées */}
-                                    <IconButton onClick={() => {
-                                        setDeleteConfirmationIsShown(true);
-                                        setTodoToDelete(todo);
-                                    }}>
-                                        <Delete/>
-                                    </IconButton>
+                                    {editIsShown === todo.id ?
+                                        <Fragment>
+                                            {/* Bouton permettant de valider l'edition et de lancer la méthode d'Update du Context et en lui
+                                            passant un objet contenant l'id et le nouveau texte du pense-bête sélectionnée */}
+                                            <IconButton onClick={onEditSubmit.bind(this, todo.id)}>
+                                                <DoneIcon/>
+                                            </IconButton>
+                                            {/* Bouton permettant d'annuler l'edition */}
+                                            <IconButton onClick={() => {setEditIsShown(false);}}>
+                                                <CloseIcon/>
+                                            </IconButton>
+                                        </Fragment>
+                                        :
+                                        <Fragment>
+                                            {/* Bouton permettant l'édition d'un pense-bête et ses actions liées */}
+                                            <IconButton onClick={() => {
+                                                setEditIsShown(todo.id);
+                                                setEditTodoText(todo.text);
+                                                setEditTodoDescription(todo.description);
+                                            }}>
+                                                <EditIcon/>
+                                            </IconButton>
+                                            {/* Zone d'icônes pour la suppression d'un pense-bête */}
+                                            {/* Bouton permettant la suppression d'un pense-bête et ses actions liées */}
+                                            <IconButton onClick={() => {
+                                                setDeleteConfirmationIsShown(true);
+                                                setTodoToDelete(todo);
+                                            }}>
+                                                <Delete/>
+                                            </IconButton>
+                                        </Fragment>
+                                    }
                                 </TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
                 </Table>
             
-            {/* Informations à passer à la fonction DeleteDialog lorsque l'on clique sur le bouton desuppression d'un pense-bête */}
+            {/* Informations à passer à la fonction DeleteDialog lorsque l'on clique sur le bouton de suppression d'un pense-bête */}
             {deleteConfirmationIsShown && (
                 <DeleteDialog todo={todoToDelete} 
                               open={deleteConfirmationIsShown} 
