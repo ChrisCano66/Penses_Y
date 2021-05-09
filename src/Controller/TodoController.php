@@ -83,14 +83,14 @@ class TodoController extends AbstractController
             $this->entityManager->flush();
         } catch (\Exception $exception) {
             return $this->json([
-                'message' => ['text' => ['Votre pense-bête n\'a pas pu être envoyé à la base de données ! '], 'level' => 'error']
+                'message' => ['text' => 'Impossible de joindre la Base de données afin d\'envoyé le Pense-bête !', 'level' => 'error']
             ]);
         }
 
         /** on retourne un message de confirmation */
         return $this->json([
             'todo' => $todo->toArray(),
-            'message' => ['text' => ['Le Pense-bête a bien été créé ! ', 'Pense-bête : '.$content->text], 'level' => 'success']
+            'message' => ['text' => 'Le Pense-bête a bien été créé !', 'level' => 'success']
         ]);
     }
 
@@ -117,12 +117,14 @@ class TodoController extends AbstractController
             /** On push ces nouvelles données dans la bdd */
             $this->entityManager->flush();
         } catch (\Exception $exception) {
-            //error message
+            return $this->json([
+                'message' => ['text' => 'Impossible de joindre la Base de données afin de mettre à jour le Pense-bête !', 'level' => 'error']
+            ]);
         }
 
         /** on retourne un message de confirmation dela mise à jour */
         return $this->json([
-            'message' => 'Le pense-bête a été mis à jour.',
+            'message' => ['text' => 'Le pense-bête a été mis à jour.', 'level' => 'success']
         ]);
     }
 
@@ -143,12 +145,14 @@ class TodoController extends AbstractController
             /** On push ces nouvelles données dans la bdd */
             $this->entityManager->flush();
         } catch (\Exception $exception) {
-            //error message
+            return $this->json([
+                'message' => ['text' => 'Impossible de joindre la Base de données afin de supprimer le Pense-bête !', 'level' => 'error']
+            ]);
         }
 
         /** on retourne un message de confirmation de la suppression */
         return $this->json([
-            'message' => 'Le pense-bête a bien été supprimé.',
+            'message' => ['text' => 'Le pense-bête a bien été supprimé.', 'level' => 'success']
         ]);
     }
 
