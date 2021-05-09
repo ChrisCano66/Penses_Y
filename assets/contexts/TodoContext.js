@@ -80,17 +80,18 @@ export default class TodoContextProvider extends Component {
                     });
                 } else {
                     // on récupère les penses-bête déjà présents
-                    let datas = [...this.state.todos];
+                    let todos = [...this.state.todos];
                     // on recherche l'id du pense-bête que l'on veut éditer avec l'id dans données récupérées 
                     // et on passe cela à une variable "todo"
-                    let todo = datas.find(todo => {
+                    let todo = todos.find(todo => {
                         return todo.id === data.id
                     }); 
-                    // on assigne les nouvelles données de texte
-                    todo.text = data.text
+                    // on assigne les nouvelles données de texte (donnée côté serveur et non JS)
+                    todo.text = response.data.todo.text;
+                    todo.description = response.data.todo.description;
                     // on change la constante d'état
                     this.setState( {
-                        todos: datas,
+                        todos: todos,
                         message: response.data.message,
                     });
                 } 
@@ -113,17 +114,17 @@ export default class TodoContextProvider extends Component {
                     });
                 } else {
                     // on récupère les penses-bête déjà présents
-                    let datas = [...this.state.todos];
+                    let todos = [...this.state.todos];
                     // on recherche l'id du pense-bête que l'on veut éditer avec l'id dans données récupérées 
                     // et on passe cela à une variable "todo"
-                    let todo = datas.find(todo => {
+                    let todo = todos.find(todo => {
                         return todo.id === data.id
                     });
                     // on récupère alors l'ensemble des datas en enlevant le pense-bête que l'on veut supprimer (grâce au Splice)
-                    datas.splice(datas.indexOf(todo),1)
+                    datas.splice(todos.indexOf(todo),1)
                     // on change la constante d'état
                     this.setState( {
-                        todos: datas,
+                        todos: todos,
                         message: response.data.message,
                     });
                 }
