@@ -25,7 +25,7 @@ class TodoType extends AbstractType
                     new NotBlank(['message' => 'Le nom du pense-bête ne peut pas être vide !']),
                     new Length([
                         'min' => 1,
-                        'max' => 35,
+                        'max' => 20,
  
                         'minMessage' => 'Entrer au moins 1 charactère !',
                         'maxMessage' => 'Vous avez rentré {{ value }} mais vous ne pouvez en entrer qu\'au maximum {{ limit }} charactères !',

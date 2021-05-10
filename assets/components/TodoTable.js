@@ -73,14 +73,14 @@ function TodoTable () {
                                         la méthode "onChange" va contrôler le changement d'état de la constante -> sur un event il va 
                                         donc rajouter la valeur du TextField à la constante d'état La validation du champ avec 
                                         la touche entrée permet le submit ! */}
-                                    <TextField
+                                    <TextField                                        
                                         color="primary"
                                         variant="outlined"
                                         size="small"
                                         type="text"
                                         value={addTodoTask}
                                         onChange={(event) => {setAddTodoTask(event.target.value)}}
-                                        label="Nom du Pense-Bête"
+                                        label="Titre"
                                         fullWidth={true}/>
                                 </form>
                             </TableCell>
@@ -93,7 +93,7 @@ function TodoTable () {
                                         type="text"
                                         value={addTodoDescription}
                                         onChange={(event) => {setAddTodoDescription(event.target.value)}}
-                                        label="Description du Pense-Bête"
+                                        label="Description"
                                         fullWidth={true} multiline={true}/>
                                 </form>
                             </TableCell>
@@ -108,7 +108,7 @@ function TodoTable () {
                         </TableRow>
                         {/* En-tête de la table */}
                         <TableRow className={classes.thead}>
-                            <TableCell width={200}>Pense-Bête</TableCell>
+                            <TableCell width={180}>Pense-Bête</TableCell>
                             <TableCell>Description</TableCell>
                             <TableCell align="right">Actions</TableCell>
                         </TableRow>
