@@ -1,12 +1,21 @@
 import React, {Fragment, useContext, useState} from 'react';
 import {TodoContext} from "../contexts/TodoContext.js";
 import DeleteDialog from './DeleteDialog.js';
-import {IconButton, Table, TableBody, TableCell, TableHead, TableRow, TextField, Typography} from "@material-ui/core";
+import {IconButton, Table, TableBody, TableCell, TableHead, TableRow, TextField, Typography, makeStyles} from "@material-ui/core";
 import AddIcon from '@material-ui/icons/Add';
 import EditIcon from '@material-ui/icons/Edit';
 import Delete from '@material-ui/icons/Delete';
 import DoneIcon from '@material-ui/icons/Done';
 import CloseIcon from '@material-ui/icons/Close';
+
+
+// constante permettant d'utiliser les styles du theme
+const useStyles = makeStyles(theme => ({
+    thead: {
+        // ici on change la couleur du header de la table en lui appliquant la couleur primary
+        backgroundColor: theme.palette.primary.main,
+    },
+}));
 
 
 function TodoTable () {
@@ -43,24 +52,18 @@ function TodoTable () {
         setEditIsShown(false);
     }
 
-    // HTML Retourné
+    // constante récupérant les style du theme
+    const classes = useStyles();
+
+    // HTML Retourné pour l'application
     return (
 
         // Formulaire qui reprend les différents pense-bête et qui peut "submit" pour l'ajout, l'édition et la suppression d'un pense-bête =>
         // onSubmit -> method createTodo de la class TodoContextProvider qui va récupérer la valeur rajouter pour un nouveau pense-bête
-
         <Fragment>
-                <Table>
-                    {/* En-tête de la table */}
+                <Table size="small">
+                    {/* En-tête de l'application */}
                     <TableHead>
-                        <TableRow>
-                            <TableCell>Pense-Bête</TableCell>
-                            <TableCell>Description</TableCell>
-                            <TableCell align="left">Actions</TableCell>
-                        </TableRow>
-                    </TableHead>
-                    {/* Corps de la table */}
-                    <TableBody>
                         {/* Champ text pour l'ajout d'un nouveau pense-bête (nom + description) */}
                         <TableRow>
                             <TableCell>
@@ -71,6 +74,9 @@ function TodoTable () {
                                         donc rajouter la valeur du TextField à la constante d'état La validation du champ avec 
                                         la touche entrée permet le submit ! */}
                                     <TextField
+                                        color="primary"
+                                        variant="outlined"
+                                        size="small"
                                         type="text"
                                         value={addTodoTask}
                                         onChange={(event) => {setAddTodoTask(event.target.value)}}
@@ -81,6 +87,9 @@ function TodoTable () {
                             <TableCell>
                                 <form>
                                     <TextField
+                                        color="primary"
+                                        variant="outlined"
+                                        size="small"
                                         type="text"
                                         value={addTodoDescription}
                                         onChange={(event) => {setAddTodoDescription(event.target.value)}}
@@ -88,12 +97,24 @@ function TodoTable () {
                                         fullWidth={true} multiline={true}/>
                                 </form>
                             </TableCell>
-                            <TableCell align="right">
-                                <IconButton onClick={onCreateSubmit}>
+                            <TableCell width={130} align="right">
+                                <IconButton 
+                                    color="primary" 
+                                    onClick={onCreateSubmit}
+                                >
                                     <AddIcon/>
                                 </IconButton>
                             </TableCell>
                         </TableRow>
+                        {/* En-tête de la table */}
+                        <TableRow className={classes.thead}>
+                            <TableCell width={200}>Pense-Bête</TableCell>
+                            <TableCell>Description</TableCell>
+                            <TableCell align="right">Actions</TableCell>
+                        </TableRow>
+                    </TableHead>
+                    {/* Corps de la table */}
+                    <TableBody>
                         {/* Zone d'icônes pour l'édition d'un pense-bête (nom + description) */}
                         {/* Récupération des pense-bête dans le context (TodoContextProvider)
                             slice() => permet de copier une partie d'un tableau et de le renvoyer
@@ -141,18 +162,18 @@ function TodoTable () {
                                         <Fragment>
                                             {/* Bouton permettant de valider l'edition et de lancer la méthode d'Update du Context et en lui
                                             passant un objet contenant l'id et le nouveau texte du pense-bête sélectionnée */}
-                                            <IconButton onClick={onEditSubmit.bind(this, todo.id)}>
+                                            <IconButton color="primary" onClick={onEditSubmit.bind(this, todo.id)}>
                                                 <DoneIcon/>
                                             </IconButton>
                                             {/* Bouton permettant d'annuler l'edition */}
-                                            <IconButton onClick={() => {setEditIsShown(false);}}>
+                                            <IconButton color="secondary" onClick={() => {setEditIsShown(false);}}>
                                                 <CloseIcon/>
                                             </IconButton>
                                         </Fragment>
                                         :
                                         <Fragment>
                                             {/* Bouton permettant l'édition d'un pense-bête et ses actions liées */}
-                                            <IconButton onClick={() => {
+                                            <IconButton color="primary" onClick={() => {
                                                 setEditIsShown(todo.id);
                                                 setEditTodoTask(todo.task);
                                                 setEditTodoDescription(todo.description);
@@ -161,7 +182,7 @@ function TodoTable () {
                                             </IconButton>
                                             {/* Zone d'icônes pour la suppression d'un pense-bête */}
                                             {/* Bouton permettant la suppression d'un pense-bête et ses actions liées */}
-                                            <IconButton onClick={() => {
+                                            <IconButton color="secondary" onClick={() => {
                                                 setDeleteConfirmationIsShown(true);
                                                 setTodoToDelete(todo);
                                             }}>
