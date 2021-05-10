@@ -1,7 +1,9 @@
 // REACT
 import React, {useState} from 'react';
+// ROUTER
+import {Link} from 'react-router-dom';
 // MUI COMPONENTS
-import {AppBar, Toolbar, IconButton, Link, Box, Button, Drawer, List, ListItem, ListItemText, ListItemIcon, makeStyles} from "@material-ui/core";
+import {AppBar, Toolbar, IconButton, Button, Drawer, List, ListItem, ListItemText, ListItemIcon, makeStyles, Typography} from "@material-ui/core";
 // MUI ICON
 import {Menu as MenuIcon, List as ListIcon, Label as LabelIcon} from '@material-ui/icons';
 
@@ -15,6 +17,10 @@ const useStyles = makeStyles(theme => ({
     },
     list:{
         width: '200px',
+    },
+    link:{
+        textDecoration: 'none',
+        color: theme.palette.text.primary,
     },
 }));
 
@@ -39,8 +45,8 @@ const Navigation = () => {
     // un objet reprennant le nom de l'item et l'icône associé
     // un objet reprenant le tag associé et le label de l'icône
     const drawerItems= [
-        {text: 'TodoList', icon: <ListIcon/>},
-        {text: 'Tags', icon: <LabelIcon/>}
+        {text: 'TodoList', icon: <ListIcon/>, link: '/todo-list'},
+        {text: 'Tags', icon: <LabelIcon/>, link: '/tag-list'}
     ];
 
     return (
@@ -56,14 +62,15 @@ const Navigation = () => {
                 ><MenuIcon/></IconButton>
 
                 {/** Titre principale de l'application */}
-                <Link 
-                    href="/"
-                    style={{flexGrow: 1}}
-                    align="center"
-                    color="textPrimary" 
-                    underline="none" 
-                    variant="h4"
-                >Penser-Y !</Link>
+                <Link to="/todo-list" className={classes.link}>
+                    <Typography
+                        style={{flexGrow: 1}}
+                        align="center"
+                        color="textPrimary" 
+                        underline="none" 
+                        variant="h4"
+                    >Penses-Y !</Typography>
+                </Link>
 
                 {/** Bouton Login pour l'application */}
                 <Button 
@@ -84,16 +91,17 @@ const Navigation = () => {
                     {/** on récupère la liste des items contenu dans drawerItems */}
                     {drawerItems.map(prop => (
                         // On crée chaque item
-                        <ListItem 
-                            // car c'est cliquable
-                            button 
+                        <Link 
+                            className={classes.link}
+                            to={prop.link}
                             // nécessaire car nous somme dans une fonction map (ici on prendra le text des drawerItems)
                             key={prop.text}
-                            onClick={toggleDrawer}
                         >
-                            <ListItemIcon>{prop.icon}</ListItemIcon>
-                            <ListItemText>{prop.text}</ListItemText>
-                        </ListItem>
+                            <ListItem onClick={toggleDrawer} button>
+                                <ListItemIcon>{prop.icon}</ListItemIcon>
+                                <ListItemText>{prop.text}</ListItemText>
+                            </ListItem>
+                        </Link>
                     ))}
                 </List>
             </Drawer>
