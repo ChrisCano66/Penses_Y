@@ -2,12 +2,16 @@
 
 namespace App\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Routing\Annotation\Route;
-use Doctrine\ORM\EntityManagerInterface;
-use App\Repository\TodoRepository;
-use Symfony\Component\HttpFoundation\Request;
 use App\Entity\Todo;
+use App\Form\TodoType;
+use App\Repository\TodoRepository;
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
+use Doctrine\ORM\EntityManagerInterface;
+use Exception;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Annotation\Route;
 
 #[Route('/api/todo', name: 'api_todo')]
 class TodoController extends AbstractController
@@ -72,8 +76,35 @@ class TodoController extends AbstractController
         /** on crée un nouveau pense-bête */
         $todo = new Todo();
 
+        /** Création d'un form symfony pour la vérifaication des données (TodoType.php) */        
+        $form = $this->createForm(TodoType::class);
+        /** formatage du contenu sous forme d'array */
+        $nonObject = (array)$content;
+        /** on enlève la partie liée à l'ID */
+        unset($nonObject['id']);
+        /** on soumet le contenu à validation */
+        $form->submit($nonObject);
+ 
+        /** si ce la validation n'est pas validée */
+        if (!$form->isValid()) {
+            /** on récupères les erreurs sous forme d'array */
+            $errors = [];
+            /** on récupère les messages liées aux erreurs */
+            /** getErrors(depp = true, flatten = true) */
+            foreach ($form->getErrors(true, true) as $error) {
+                /** on récupère si c'est une task ou une desccription */
+                $propertyName = $error->getOrigin()->getName();
+                /** on récupère le message d'erreur liés */
+                $errors[$propertyName] = $error->getMessage();
+            }
+            /** on retourne le message d'erreur en joignant les deux parties (nom + message) récupérées */
+            return $this->json([
+                'message' => ['text' => join("\n", $errors), 'level' => 'error'],
+            ]); 
+        }
+
         /** on set le text avec le setter de Todo.php */
-        $todo->setText($content->text);
+        $todo->setTask($content->task);
         $todo->setDescription($content->description);
 
         /** On va faire persister ces doinnées dans la bdd */
@@ -110,17 +141,45 @@ class TodoController extends AbstractController
          * et de les stocker dans la varible */
         $content = json_decode($request->getContent());
 
+        /** Création d'un form symfony pour la vérifaication des données (TodoType.php) */        
+        $form = $this->createForm(TodoType::class);
+        /** formatage du contenu sous forme d'array */
+        $nonObject = (array)$content;
+        /** on enlève la partie liée à l'ID */
+        unset($nonObject['id']);
+        /** on soumet le contenu à validation */
+        $form->submit($nonObject);
+ 
+        /** si ce la validation n'est pas validée */
+        if (!$form->isValid()) {
+            /** on récupères les erreurs sous forme d'array */
+            $errors = [];
+            /** on récupère les messages liées aux erreurs */
+            /** getErrors(depp = true, flatten = true) */
+            foreach ($form->getErrors(true, true) as $error) {
+                /** on récupère si c'est une task ou une desccription */
+                $propertyName = $error->getOrigin()->getName();
+                /** on récupère le message d'erreur liés */
+                $errors[$propertyName] = $error->getMessage();
+            }
+            /** on retourne le message d'erreur en joignant les deux parties (nom + message) récupérées */
+            return $this->json([
+                'message' => ['text' => join("\n", $errors), 'level' => 'error'],
+            ]);
+ 
+        }
+
         // On compare les données de la BDD avec les nouvelles donées que l'on veut mettre a jour pour le pense-bête sélectionné
         // s'il n'y apas de changement (aussi bien pour le nom du pense-bête que pour la description) on renvoit un message 
         // indiquant qu'il n'y apas eu de changement et donc qu'il n'est pas nécessaire de faire la mise à jour du pense-bête
-        if ($todo->getText() === $content->text && $todo->getDescription() === $content->description) {
+        if ($todo->getTask() === $content->task && $todo->getDescription() === $content->description) {
             return $this->json([
-                'message' => ['text' => 'Il n\'y a pas eu de changement (nom ou description) dans le Pense-bête !', 'level' => 'error'],
+                'message' => ['text' => 'Il n\'y a pas eu de changement (titre ou description) dans le Pense-bête !', 'level' => 'error'],
             ]);
         }
 
         /** on set le nouveau text mis à jour avec le setter de Todo.php */
-        $todo->setText($content->text);
+        $todo->setTask($content->task);
         $todo->setDescription($content->description);
 
         /** update de la bdd avec les nouvelles données On push ces nouvelles données dans la bdd */

@@ -87,7 +87,7 @@ export default class TodoContextProvider extends Component {
                         return todo.id === data.id
                     }); 
                     // on assigne les nouvelles données de texte (donnée côté serveur et non JS)
-                    todo.text = response.data.todo.text;
+                    todo.task = response.data.todo.task;
                     todo.description = response.data.todo.description;
                     // on change la constante d'état
                     this.setState( {

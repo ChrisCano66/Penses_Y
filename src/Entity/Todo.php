@@ -21,7 +21,7 @@ class Todo
      * @ORM\Column(type="string", length=255)
      * Correspond au nom du pense-bête mais peut servir "pavé de texte" pour le pense-bête 
      */
-    private $text;
+    private $task;
 
     /**
      * @ORM\Column(type="string", length=500)
@@ -35,14 +35,14 @@ class Todo
         return $this->id;
     }
 
-    public function getText(): ?string
+    public function getTask(): ?string
     {
-        return $this->text;
+        return $this->task;
     }
 
-    public function setText(string $text): self
+    public function setTask(string $task): self
     {
-        $this->text = $text;
+        $this->task = $task;
 
         return $this;
     }
@@ -64,6 +64,6 @@ class Todo
      */
     public function toArray()
     {
-        return ['id' => $this->id, 'text' => $this->text, 'description' => $this->description];
+        return ['id' => $this->id, 'task' => $this->task, 'description' => $this->description];
     }
 }

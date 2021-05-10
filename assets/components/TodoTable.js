@@ -14,13 +14,13 @@ function TodoTable () {
     // constante de context sous forme de Hooks utilisant le "useContext" afin de pouvoir utiliser le contextProvider
     const context = useContext(TodoContext);
     // constante d'état permettant l'ajout d'un pense-bête ("le nom") sous forme de Hooks utilisant le "state" et qui est initialiser par une String vide
-    const [addTodoText, setAddTodoText] = useState('');
+    const [addTodoTask, setAddTodoTask] = useState('');
     // constante d'état permettant l'ajout d'un pense-bête ("description") sous forme de Hooks utilisant le "state" et qui est initialiser par une String vide
     const [addTodoDescription, setAddTodoDescription] = useState('');
     // constante d'état permettant de savoir l'état de l'action d'édition d'un pense-bête sous forme de Hooks utilisant le "state"
     const [editIsShown, setEditIsShown] = useState(false);
     // constante d'état permettant d'édition du nom d'un pense-bête sous forme de Hooks utilisant le "state" et qui est initialiser par une String vide
-    const [editTodoText, setEditTodoText] = useState('');
+    const [editTodoTask, setEditTodoTask] = useState('');
     // constante d'état permettant d'édition de la description d'un pense-bête sous forme de Hooks utilisant le "state" et qui est initialiser par une String vide
     const [editTodoDescription, setEditTodoDescription] = useState('');
     // constante d'état permettant de savoir l'état de l'action de suppression d'un pense-bête sous forme de Hooks utilisant le "state"
@@ -31,15 +31,15 @@ function TodoTable () {
     // const qui permet de créer un Pense-bête en reliant l'information Front-end (TodoTable) au transfert de l'info back-end (TodoContext + axios)
     const onCreateSubmit = (event) => {
         event.preventDefault();
-        context.createTodo(event, {text: addTodoText, description: addTodoDescription});
-        setAddTodoText('');
+        context.createTodo(event, {task: addTodoTask, description: addTodoDescription});
+        setAddTodoTask('');
         setAddTodoDescription('');
     }
 
     // const qui permet de mettre à jour un Pense-bête en reliant l'information Front-end (TodoTable) au transfert de l'info back-end (TodoContext + axios)
     const onEditSubmit = (todoId, event) => {
         event.preventDefault();
-        context.updateTodo({id: todoId, text: editTodoText, description: editTodoDescription});
+        context.updateTodo({id: todoId, task: editTodoTask, description: editTodoDescription});
         setEditIsShown(false);
     }
 
@@ -72,8 +72,8 @@ function TodoTable () {
                                         la touche entrée permet le submit ! */}
                                     <TextField
                                         type="text"
-                                        value={addTodoText}
-                                        onChange={(event) => {setAddTodoText(event.target.value)}}
+                                        value={addTodoTask}
+                                        onChange={(event) => {setAddTodoTask(event.target.value)}}
                                         label="Nom du Pense-Bête"
                                         fullWidth={true}/>
                                 </form>
@@ -111,13 +111,13 @@ function TodoTable () {
                                                 type="text"
                                                 fullWidth={true}
                                                 autoFocus={true}
-                                                value={editTodoText}
-                                                onChange={(event) => {setEditTodoText(event.target.value);}}
+                                                value={editTodoTask}
+                                                onChange={(event) => {setEditTodoTask(event.target.value);}}
                                             />
                                         </form>
                                         :
                                         // typography => juste donné plus de style à l'écriture
-                                        <Typography>{todo.text}</Typography>
+                                        <Typography>{todo.task}</Typography>
                                     }
                                 </TableCell>
                                 <TableCell>
@@ -154,7 +154,7 @@ function TodoTable () {
                                             {/* Bouton permettant l'édition d'un pense-bête et ses actions liées */}
                                             <IconButton onClick={() => {
                                                 setEditIsShown(todo.id);
-                                                setEditTodoText(todo.text);
+                                                setEditTodoTask(todo.task);
                                                 setEditTodoDescription(todo.description);
                                             }}>
                                                 <EditIcon/>

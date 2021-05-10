@@ -17,14 +17,14 @@ function DeleteDialog (props) {
         <Dialog open={props.open} close={hideDialog}>
             <DialogTitle>Êtes-vous sûr de vouloir supprimer ce Pense-bête ?</DialogTitle>
             <DialogContent>
-                {props.todo.text}
+                {props.todo.task}
             </DialogContent>
             <DialogActions>
                 {/* Action déclancchée pour l'annulation de la suppression d'un pense-bête */} 
                 <Button onClick={hideDialog}>Annuler</Button>
                 {/* Action déclanchée pour la confirmation de la suppression d'un pense-bête */} 
                 <Button onClick={() => {
-                    context.deleteTodo({id: props.todo.id, text: props.todo.text});
+                    context.deleteTodo({id: props.todo.id, task: props.todo.task});
                     hideDialog();
                 }}>Supprimer</Button>
             </DialogActions>
@@ -36,10 +36,10 @@ function DeleteDialog (props) {
 // variables/paramètres qui sont crées dans la fonction DeleteDialog. Mais aussi ce sont les varaibles qui seront transmisent 
 // à la fonction via le TodoTable
 DeleteDialog.propTypes ={
-    // On force la paramètre "todo" à renvoyer un objet qui récupère une id et un textdu pense-bête sélectionné ({id: PropTypes.number, text:propTypes.string})
+    // On force la paramètre "todo" à renvoyer un objet qui récupère une id et un nom/description du pense-bête sélectionné ({id: PropTypes.number, text:propTypes.string})
     todo: PropTypes.shape({
         id: PropTypes.number.isRequired, 
-        text: PropTypes.string.isRequired,
+        task: PropTypes.string.isRequired,
     }),
     // On force la paramètre "Open" à être un booleen
     open: PropTypes.bool.isRequired,

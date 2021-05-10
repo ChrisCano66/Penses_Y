@@ -30,7 +30,7 @@ function AppSnackbar () {
             {context.message.text && (
                 /** on passe alors le message au component et une action sous forme de bouton */
                 <SnackbarContent 
-                    style={{backgroundColor: checkLevel(context.message.level)}}
+                    style={{backgroundColor: checkLevel(context.message.level), whiteSpace: 'pre'}}
                     /** permet de "personalisé" le text du bouton avec le text du message multi-lignes (TodoController) */
                     message={context.message.text} 
                     action={
